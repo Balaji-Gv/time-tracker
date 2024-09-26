@@ -14,7 +14,7 @@ function App() {
         <Header />
         <div className="flex flex-1">
           <Sidebar />
-          <main className="flex-1 p-6 bg-gray-100">
+          <main className="flex-1 p-6 rounded-3xl bg-gray-100">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />

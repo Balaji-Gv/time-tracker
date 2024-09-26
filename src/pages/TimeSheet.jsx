@@ -61,18 +61,18 @@ const TimeSheet = () => {
         </div>
         <div>
           {/* Button with Calendar and Week Navigation */}
-          <button
-            className="flex items-center bg-orange-200 text-orange-600 rounded-full px-4 py-2"
-            onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} // Toggle date picker on calendar icon click
-          >
-            <IoCalendarOutline className="size-5" />
+          <div className="flex items-center bg-orange-200 text-orange-600 rounded-full px-4 py-2">
+            <IoCalendarOutline
+              onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} // Toggle date picker on calendar icon click
+              className="size-5 cursor-pointer"
+            />
             <span className="m-2">
               {startDate ? format(startDate, "MMMM dd, yyyy") : "This Week"}
               {/* Display selected date or "This Week" */}
             </span>
             <IoChevronBack className="mr-1 ml-16" />
             <IoChevronForward className="mr-1" />
-          </button>
+          </div>
 
           {/* Render DatePicker only when date picker is open */}
           {isDatePickerOpen && (

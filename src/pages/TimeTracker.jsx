@@ -7,11 +7,7 @@ import {
   FaStar,
   FaCalendarAlt,
 } from "react-icons/fa";
-import {
-  IoCalendarOutline,
-  IoChevronBackCircleOutline,
-  IoChevronForward,
-} from "react-icons/io5";
+import { IoChevronBackCircleOutline, IoChevronForward } from "react-icons/io5";
 
 const TimeTracker = () => {
   // select project model section
@@ -416,7 +412,7 @@ const TimeTracker = () => {
                   />
                 </td>
                 <td className="px-4 py-2">
-                  <IoCalendarOutline className="text-orange-500" />
+                  <FaCalendarAlt className="text-orange-500" />
                 </td>
                 <td className="px-4 py-2">{task.duration}</td>
                 <td className="px-4 py-2 flex space-x-2">
