@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import TaskTable from "./TaskTable"; // Import the separated table component
 import {
   FaChevronDown,
   FaEdit,
@@ -12,6 +13,7 @@ import { IoChevronBackCircleOutline, IoChevronForward } from "react-icons/io5";
 const TimeTracker = () => {
   // select project model section
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const modalRef = useRef(null);
 
   // Handle closing the modal when clicking outside
@@ -82,8 +84,7 @@ const TimeTracker = () => {
   const [selectAll, setSelectAll] = useState(false); // State for "select all" checkbox
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Data array for tasks
-  const tasks = [
+  const [tasks, setTasks] = useState([
     {
       id: 1,
       task: "DSM",
@@ -116,7 +117,35 @@ const TimeTracker = () => {
       end: "06:50",
       duration: "00:50:26",
     },
-  ];
+  ]);
+
+  // Handle project selection
+  const handleProjectSelection = (projectName) => {
+    const newTask = {
+      id: tasks.length + 1,
+      task: "New Task", // Placeholder task name
+      project: projectName,
+      start: "00:00",
+      end: "00:00",
+      duration: "00:00:00",
+    };
+    setTasks([...tasks, newTask]); // Add the new task to the task list
+    setIsModalOpen(false); // Close the modal
+  };
+
+  // Handle task deletion
+  const handleDeleteTask = (id) => {
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    setTasks(updatedTasks);
+  };
+
+  // Handle task editing
+  const handleEditTask = (id, updatedTask) => {
+    const updatedTasks = tasks.map((task) =>
+      task.id === id ? updatedTask : task
+    );
+    setTasks(updatedTasks);
+  };
 
   // Toggle bulk edit mode
   const handleBulkEdit = () => {
@@ -191,6 +220,7 @@ const TimeTracker = () => {
             </div>
 
             {/* Modal with Search Box and Project List */}
+            {/* Modal with Search Box and Project List */}
             {isModalOpen && (
               <div
                 ref={modalRef}
@@ -213,7 +243,10 @@ const TimeTracker = () => {
                     <span className="text-gray-400">1 project</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="flex items-center">
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={() => handleProjectSelection("Cricmatch")}
+                    >
                       <span className="text-blue-500 mr-2">●</span> Cricmatch
                     </div>
                     <div className="flex items-center">
@@ -231,18 +264,10 @@ const TimeTracker = () => {
                     <h3 className="text-gray-600 font-semibold">NO CLIENT</h3>
                     <span className="text-gray-400">3 projects</span>
                   </div>
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex items-center">
-                      <span className="text-blue-500 mr-2">●</span> Cricmatch
-                    </div>
-                    <div className="flex items-center">
-                      <button className="text-orange-400 mr-2">
-                        Create task
-                      </button>
-                      <FaStar className="text-orange-400" />
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mb-2">
+                  <div
+                    className="flex justify-between items-center mb-2 cursor-pointer"
+                    onClick={() => handleProjectSelection("Project B")}
+                  >
                     <div className="flex items-center">
                       <span className="text-green-500 mr-2">●</span> Project B
                     </div>
@@ -253,7 +278,10 @@ const TimeTracker = () => {
                       <FaStar className="text-orange-400" />
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div
+                    className="flex justify-between items-center mb-2 cursor-pointer"
+                    onClick={() => handleProjectSelection("Others")}
+                  >
                     <div className="flex items-center">
                       <span className="text-gray-500 mr-2">●</span> Others
                     </div>
@@ -328,130 +356,11 @@ const TimeTracker = () => {
       </div>
       {/* Time Entries Table */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center">
-            {/* Checkbox for selecting all */}
-            {bulkEdit && (
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                className="mr-2"
-              />
-            )}
-            <h2 className="font-semibold">Today</h2>
-            {bulkEdit && (
-              <>
-                <button
-                  className="text-red-500 px-4 py-2 ml-10 bg-red-200 rounded-3xl"
-                  onClick={handleDeleteSelected}
-                >
-                  Delete
-                </button>
-                <button
-                  className="text-gray-500 px-4 py-2 ml-3 bg-gray-200 rounded-3xl"
-                  onClick={handleBulkEdit}
-                >
-                  Bulk edit
-                </button>
-                <button
-                  className="text-gray-500 px-4 py-2 ml-3 bg-gray-200 rounded-3xl"
-                  onClick={handleBulkEdit}
-                >
-                  Cancel
-                </button>
-              </>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <span className="text-gray-500">Total | 05:32:59</span>
-              {!bulkEdit && (
-                <button
-                  className="ml-4 text-blue-500 px-6 py-2 bg-blue-200 rounded-3xl"
-                  onClick={handleBulkEdit}
-                >
-                  Bulk edit
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Table Structure */}
-        <table className="w-full table-auto border-collapse">
-          <tbody>
-            {tasks.map((task) => (
-              <tr key={task.id}>
-                {bulkEdit && (
-                  <td className="px-4 py-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.includes(task.id)}
-                      onChange={() => handleSelectRow(task.id)}
-                    />
-                  </td>
-                )}
-                <td className="px-4 py-2">{task.task}</td>
-                <td className="px-4 py-2 text-green-500">● {task.project}</td>
-                <td className="px-4 py-2">
-                  <input
-                    type="text"
-                    value={task.start}
-                    className="border border-gray-300 text-center w-16 rounded-lg"
-                    readOnly
-                  />
-                </td>
-                <td className="px-4 py-2">
-                  <input
-                    type="text"
-                    value={task.end}
-                    className="border border-gray-300 text-center w-16 rounded-lg"
-                    readOnly
-                  />
-                </td>
-                <td className="px-4 py-2">
-                  <FaCalendarAlt className="text-orange-500" />
-                </td>
-                <td className="px-4 py-2">{task.duration}</td>
-                <td className="px-4 py-2 flex space-x-2">
-                  <button className="text-orange-500">
-                    <FaEdit />
-                  </button>
-                  <button className="text-orange-500">
-                    <FaTrashAlt />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h2 className="text-lg font-semibold mb-4">
-                Are you sure you want to delete the selected rows?
-              </h2>
-              <div className="flex justify-end space-x-4">
-                <button
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg"
-                  onClick={confirmDelete}
-                >
-                  Delete
-                </button>
-                <button
-                  className="px-4 py-2 bg-gray-300 rounded-lg"
-                  onClick={() => setShowDeleteModal(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <TaskTable
+          tasks={tasks}
+          handleDeleteTask={handleDeleteTask}
+          handleEditTask={handleEditTask}
+        />
       </div>
 
       {/* Previous Days */}
