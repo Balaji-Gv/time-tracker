@@ -13,9 +13,16 @@ import { format, addDays, subDays } from "date-fns";
 const TimeSheet = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [selectedProjectRows, setSelectedProjectRows] = useState([]); // Now initially empty
   const [isProjectDropdownOpen, setIsProjectDropdownOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Initialize with a default project row
+  const [selectedProjectRows, setSelectedProjectRows] = useState([
+    {
+      project: "Default Project", // Default project name
+      timeEntries: Array(6).fill(""), // Empty time entries
+    },
+  ]);
 
   const projects = [
     "Project A",
@@ -35,7 +42,6 @@ const TimeSheet = () => {
     const cleanValue = value.replace(/[^0-9]/g, "").slice(0, 8); // Keep only digits and limit to 8 characters
     const updatedRows = [...selectedProjectRows];
 
-    // Update timeEntries with the new formatted value
     updatedRows[rowIndex].timeEntries[dayIndex] = formatTime(cleanValue);
     setSelectedProjectRows(updatedRows);
   };
@@ -238,12 +244,14 @@ const TimeSheet = () => {
                 <td className="p-6 text-left text-orange-500">
                   <div className="flex items-center justify-between">
                     {row.project}
-                    <button
-                      className="ml-2 text-red-600"
-                      onClick={() => handleRemoveProject(row.project)}
-                    >
-                      &times;
-                    </button>
+                    {row.project !== "Default Project" && (
+                      <button
+                        className="ml-2 text-red-600"
+                        onClick={() => handleRemoveProject(row.project)}
+                      >
+                        &times;
+                      </button>
+                    )}
                   </div>
                 </td>
 
@@ -257,6 +265,7 @@ const TimeSheet = () => {
                       onChange={(e) =>
                         handleTimeChange(rowIndex, dayIndex, e.target.value)
                       }
+                      maxLength={8}
                       onFocus={handleFocus}
                     />
                   </td>
@@ -266,62 +275,50 @@ const TimeSheet = () => {
             ))
           ) : (
             <tr>
-              <td colSpan={8} className="p-6">
-                No projects selected. Please add a project.
+              <td className="p-6 text-center text-gray-500" colSpan={8}>
+                No projects selected.
               </td>
             </tr>
           )}
-        </tbody>
-        {selectedProjectRows.length > 0 && (
-          <tfoot className="border-t">
-            <tr className="text-gray-500">
-              <td className="p-6 text-left">Total</td>
-              {columnTotals.map((total, index) => (
-                <td key={index} className="p-4">
-                  {total}
-                </td>
-              ))}
-              <td className="p-4">
-                {calculateTotalTime(
-                  columnTotals.map((total) =>
-                    total === "" ? "00:00:00" : total
-                  )
-                )}
+
+          <tr>
+            <td className="p-6 text-left text-gray-500">Total</td>
+            {columnTotals.map((total, index) => (
+              <td key={index} className="p-4">
+                {total}
               </td>
-            </tr>
-          </tfoot>
-        )}
+            ))}
+            <td className="p-4"></td>
+          </tr>
+        </tbody>
       </table>
 
-      <div className="flex items-center mt-4">
-        <div className="relative">
+      <div className="flex justify-between mt-10">
+        <div>
           <button
-            className="flex px-4 py-2 bg-orange-200 rounded-3xl items-center text-orange-500"
+            className="flex items-center text-orange-500 border-orange-500 border px-4 py-2 rounded-3xl hover:text-orange-700"
             onClick={() => setIsProjectDropdownOpen(!isProjectDropdownOpen)}
           >
-            <CiCirclePlus className="mr-2 size-6" />
+            <CiCirclePlus className="size-8 mr-2" />
             Add Project
           </button>
-
+          {errorMessage && (
+            <div className="text-red-600 mt-2">{errorMessage}</div>
+          )}
           {isProjectDropdownOpen && (
-            <div className="absolute z-10 mt-2 bg-white border border-gray-200 rounded shadow-lg w-64">
-              <ul>
-                {projects.map((project) => (
-                  <li
-                    key={project}
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleProjectSelect(project)}
-                  >
-                    {project}
-                  </li>
-                ))}
-              </ul>
+            <div className="mt-2 absolute z-10 w-64 bg-white rounded-md shadow-lg">
+              {projects.map((project) => (
+                <button
+                  key={project}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  onClick={() => handleProjectSelect(project)}
+                >
+                  {project}
+                </button>
+              ))}
             </div>
           )}
         </div>
-        {errorMessage && (
-          <p className="ml-4 text-red-600 text-sm">{errorMessage}</p>
-        )}
       </div>
     </>
   );
